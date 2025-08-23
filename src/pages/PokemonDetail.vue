@@ -58,6 +58,15 @@
         />
       </div>
 
+      <hr />
+
+      <!--Summary Section-->
+      <div class="text-center my-3">
+        <h5 class="fw-bold">Pokédex Summary</h5>
+        <p class="fsf-italic">
+            {{ summary }}
+        </p>
+      </div>
 
       <div class="row">
         <div class="col-6">
@@ -79,18 +88,7 @@
         </div>
       </div>
 
-      <hr />
-
-      <div>
-        <h5>Abilities</h5>
-        <ul>
-          <li v-for="a in pokemon.abilities" :key="a.ability.name">
-            {{ a.ability.name }}
-          </li>
-        </ul>
-      </div>
-      
-    <!-- Edit Button -->
+      <!-- Edit Button -->
     <button 
         class="btn mb-3 px-4 py-2 text-white"
         style="
@@ -105,6 +103,42 @@
         >
         Edit Pokémon
     </button>
+
+      <hr />
+
+    <div>
+        <h5>Moves</h5>
+        <ul>
+            <li v-for="(m,index) in pokemon.moves.slice(0,10)" :key="m.move.name">
+                {{ index +1 }}.{{ m.move.name }}
+            </li>
+        </ul>
+    </div>
+
+      <div>
+        <h5>Abilities</h5>
+        <ul>
+          <li v-for="a in pokemon.abilities" :key="a.ability.name">
+            {{ a.ability.name }}
+          </li>
+        </ul>
+      </div>
+      
+    <div>
+        <h5>Stats</h5>
+        <div v-for="s in pokemon.stats" :key="s.stat.name" class="mb-2">
+            <label class="form-label text capitalize">{{ s.stat.name }}</label>
+            <div class="progress">
+                <div 
+                    class="progress-bar bg success"
+                    role="progressbar"
+                    :style="{width: s.base_stat + '%'}"
+                    >{{ s.base_stat }}
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     </div>
 
@@ -167,6 +201,7 @@ const store = usePokemonStore()
 const pokemon = ref({})
 const loading = ref(true)
 const imageLoaded = ref(false) // track image loading
+const summary = ref('')
 
 const editForm = ref({
   name: '',
@@ -193,8 +228,10 @@ function saveEdit() {
   alert("Pokémon info updated locally in Pinia store!")
 }
 
+
 onMounted(async () => {
   let data = null
+  summary.value = await store.fetchPokemonSpecies(route.params.id)
   try {
     data = await store.fetchPokemonDetail(route.params.id)
     if (data) {
@@ -208,6 +245,8 @@ onMounted(async () => {
     console.log("Fetched data:", data)
     loading.value = false // always stop loading, even if error
   }
+
+
 })
 
 

@@ -56,7 +56,14 @@
                 style="width:100px; height:100px"
             />
             <div class="card-body">
-                <h5 class="card-title text-capitalize">{{ p.name }}</h5>
+                <h5 class="card-title text-capitalize">
+                    {{ store.details[p.id]?.name || p.name }}
+                </h5>
+
+                <!-- Summary -->
+                 <p class="card-text text-truncate" style="max-height: 40px; overflow: hidden;">
+                    {{ summaries[p.id] || 'Loading summary...' }}
+                 </p>
             </div>
             </div>
         </div>
@@ -80,6 +87,14 @@ const store = usePokemonStore()
 const search = ref('')
 const router = useRouter()
 const hover = ref(null)
+const summaries = ref({}) 
+
+async function loadSummaries(){
+    for (let i = 1; i <= 100; i++){
+        const text = await store.fetchPokemonSpecies(i)
+        summaries.value[i] = text
+    }
+}
 
 
 function goToDetail(id) {
@@ -88,10 +103,8 @@ function goToDetail(id) {
 
 // Fetch data on page load
 onMounted(() => {
-  //if (store.pokemons.length === 0) {
+    loadSummaries()
     store.fetchPokemons()
-  //}
-  
 })
 
 // Filter computed property
